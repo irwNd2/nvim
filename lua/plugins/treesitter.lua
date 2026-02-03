@@ -4,8 +4,8 @@ return {
     build = ":TSUpdate",
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
-      "windwp/nvim-ts-autotag",
       "nvim-treesitter/nvim-treesitter-context",
+      "windwp/nvim-ts-autotag",  -- Auto close HTML/Vue/TSX tags
     },
     opts = {
       ensure_installed = {
@@ -21,12 +21,11 @@ return {
         "css",
         "vue",
         "query",
+        "go",
+        "c",
       },
-
       highlight = { enable = true },
       indent = { enable = true },
-      autotag = { enable = true },
-
       textobjects = {
         select = {
           enable = true,
@@ -44,9 +43,15 @@ return {
           goto_previous_start = { ["[f"] = "@function.outer" },
         },
       },
-
       context = { enable = true },
     },
+    config = function(_, opts)
+      -- Setup Treesitter
+      require("nvim-treesitter.configs").setup(opts)
+
+      -- Setup autotag langsung untuk menghilangkan warning
+      require("nvim-ts-autotag").setup()
+    end,
   },
 }
 
