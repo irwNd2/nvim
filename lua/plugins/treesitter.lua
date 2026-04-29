@@ -1,57 +1,45 @@
-return {
-  {
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter-textobjects",
-      "nvim-treesitter/nvim-treesitter-context",
-      "windwp/nvim-ts-autotag",  -- Auto close HTML/Vue/TSX tags
-    },
-    opts = {
-      ensure_installed = {
-        "lua",
-        "vim",
-        "bash",
-        "python",
-        "json",
-        "javascript",
-        "typescript",
-        "tsx",
-        "html",
-        "css",
-        "vue",
-        "query",
-        "go",
-        "c",
-      },
-      highlight = { enable = true },
-      indent = { enable = true },
-      textobjects = {
-        select = {
-          enable = true,
-          keymaps = {
-            ["af"] = "@function.outer",
-            ["if"] = "@function.inner",
-            ["ac"] = "@class.outer",
-            ["ic"] = "@class.inner",
-          },
-        },
-        move = {
-          enable = true,
-          set_jumps = true,
-          goto_next_start = { ["]f"] = "@function.outer" },
-          goto_previous_start = { ["[f"] = "@function.outer" },
-        },
-      },
-      context = { enable = true },
-    },
-    config = function(_, opts)
-      -- Setup Treesitter
-      require("nvim-treesitter.configs").setup(opts)
+vim.pack.add({
+	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
+})
 
-      -- Setup autotag langsung untuk menghilangkan warning
-      require("nvim-ts-autotag").setup()
-    end,
-  },
-}
+-- Load manual dari opt/
+vim.cmd("packadd nvim-treesitter")
 
+-- Fix: tambahkan install dir ke runtimepath
+local parser_install_dir = vim.fn.stdpath("data") .. "/site"
+vim.opt.runtimepath:append(parser_install_dir)
+
+local ok, treesitter = pcall(require, "nvim-treesitter.config")
+if not ok then
+	vim.notify("nvim-treesitter belum terinstall / belum ke-load", vim.log.levels.WARN)
+	return
+end
+
+treesitter.setup({
+	parser_install_dir = parser_install_dir,
+	ensure_installed = {
+		"lua",
+		"vim",
+		"vimdoc",
+		"javascript",
+		"typescript",
+		"tsx",
+		"vue",
+		"html",
+		"css",
+		"json",
+		"jsonc",
+		"markdown",
+		"markdown_inline",
+		"go",
+		"gomod",
+		"gowork",
+		"gosum",
+	},
+	highlight = {
+		enable = true,
+	},
+	indent = {
+		enable = true,
+	},
+})

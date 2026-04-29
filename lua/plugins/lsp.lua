@@ -1,29 +1,84 @@
-return {
-  -- Install/manage LSP servers
-  {
-    "williamboman/mason.nvim",
-    config = true,
-  },
-  {
-    "williamboman/mason-lspconfig.nvim",
-    dependencies = { "williamboman/mason.nvim" },
-  },
+vim.pack.add({
+	{ src = "https://github.com/neovim/nvim-lspconfig" },
+})
 
-  -- LSP config
-  {
-    "neovim/nvim-lspconfig",
-    dependencies = { "williamboman/mason-lspconfig.nvim" },
-  },
+local capabilities = vim.lsp.protocol.make_client_capabilities()
 
-  -- Autocomplete
-  {
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",   -- completion source dari LSP
-      "hrsh7th/cmp-buffer",     -- kata dari buffer
-      "hrsh7th/cmp-path",       -- path completion
-      "L3MON4D3/LuaSnip",       -- snippet engine
-      "saadparwaiz1/cmp_luasnip",
-    },
-  },
-}
+local ok, blink = pcall(require, "blink.cmp")
+if ok then
+	capabilities = blink.get_lsp_capabilities(capabilities)
+end
+
+vim.diagnostic.config({
+	virtual_text = true,
+	signs = true,
+	underline = true,
+	update_in_insert = false,
+	severity_sort = true,
+})
+
+vim.lsp.config("lua_ls", {
+	capabilities = capabilities,
+	root_markers = {
+		".luarc.json",
+		".luarc.jsonc",
+		".git",
+		"init.lua",
+	},
+	settings = {
+		Lua = {
+			diagnostics = {
+				globals = { "vim" },
+			},
+			workspace = {
+				library = vim.api.nvim_get_runtime_file("", true),
+			},
+		},
+	},
+})
+
+vim.lsp.config("ts_ls", {
+	capabilities = capabilities,
+	filetypes = {
+		"javascript",
+		"javascriptreact",
+		"typescript",
+		"typescriptreact",
+		"vue",
+	},
+})
+
+vim.lsp.config("vue_ls", {
+	capabilities = capabilities,
+})
+
+vim.lsp.config("tailwindcss", {
+	capabilities = capabilities,
+})
+
+vim.lsp.config("eslint", {
+	capabilities = capabilities,
+})
+
+vim.lsp.config("gopls", {
+	capabilities = capabilities,
+	settings = {
+		gopls = {
+			gofumpt = true,
+			staticcheck = true,
+			analyses = {
+				unusedparams = true,
+				shadow = true,
+			},
+		},
+	},
+})
+
+vim.lsp.enable({
+	"lua_ls",
+	"ts_ls",
+	"vue_ls",
+	"tailwindcss",
+	"eslint",
+	"gopls",
+})
